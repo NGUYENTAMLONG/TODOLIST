@@ -21,7 +21,7 @@ mongoose
     console.log(err);
   });
 // PORT
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT;
 
 app.use("/api/jobs", routerJobs);
 
