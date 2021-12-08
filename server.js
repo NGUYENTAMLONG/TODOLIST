@@ -2,10 +2,12 @@ const express = require("express");
 const routerJobs = require("./routes/api/jobs");
 const mongoose = require("mongoose");
 const app = express();
+const bodyParser = require("body-parser");
 
 // BodyParser Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 // cors
 const cors = require("cors");
 app.use(cors());
