@@ -5,7 +5,7 @@ const app = express();
 
 // BodyParser Middleware
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 // cors
 const cors = require("cors");
 app.use(cors());
@@ -21,7 +21,7 @@ mongoose
     console.log(err);
   });
 // PORT
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 
 app.use("/api/jobs", routerJobs);
 
