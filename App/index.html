@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todolist</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- fontawesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    />
+
+    <style>
+      body {
+        position: relative;
+      }
+      .form {
+        position: absolute;
+        top: -400px;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        width: 400px;
+        background-color: white;
+        padding: 20px;
+        border: solid #1783f734 0.5px;
+        border-radius: 20px;
+        box-shadow: 0 0 20px #bfdeff;
+        transition: 0.5s ease-in-out;
+      }
+
+      .strike {
+        text-decoration: line-through;
+      }
+      .filter_done_check {
+        padding: 10px;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        cursor: pointer;
+        margin-bottom: 0px;
+      }
+      .active {
+        font-weight: bold;
+      }
+      .filter_active_check {
+        padding: 10px;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        cursor: pointer;
+        margin-bottom: 0px;
+      }
+
+      .btn_select_all {
+        width: 150px;
+        height: 50px;
+      }
+      .btn_delete_all_done {
+        right: 0;
+        width: 100px;
+      }
+      input[type="checkbox"] {
+        zoom: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center mb-4 mt-4">TODOLIST</h1>
+      <div class="mb-2 d-flex">
+        <input
+          class="form-control mr-4"
+          id="myInput"
+          type="text"
+          placeholder="Tìm kiếm công việc..."
+        />
+
+        <button class="btn btn-primary mr-4 btn_select_all">Tất cả</button>
+        <button class="btn btn-success d-flex createBtn">
+          Thêm việc <i class="fas fa-2x fa-plus-circle ml-2"></i>
+        </button>
+        <button class="btn btn-dark btn_delete_all_done position-fixed">
+          Xóa hết việc đã xong <i class="fas fa-dumpster"></i>
+        </button>
+      </div>
+      <div class="row">
+        <b
+          >Tổng số công việc
+          <span class="badge bg-primary text-light ml-2 mr-4 sumBadge"></span
+        ></b>
+        <b
+          >Số công việc hoàn thành
+          <span class="badge bg-success text-light ml-2 mr-4 sumDone"></span
+        ></b>
+        <b
+          >Số công việc đang tiến hành
+          <span class="badge bg-danger text-light ml-2 mr-4 sumActive"></span
+        ></b>
+        <b>Lọc công việc</b>
+        <p class="mr-3 ml-3 bg-success pr-2 pl-2 pt-2 filter_done_check">
+          Hoàn thành
+        </p>
+        <p class="bg-warning pr-2 pl-2 pt-2 filter_active_check">
+          Đang tiến hành
+        </p>
+      </div>
+      <table class="table table-striped table-dark table-hover table-bordered">
+        <thead>
+          <tr class="text-center">
+            <th scope="col">STT</th>
+            <th scope="col">Công việc</th>
+            <th scope="col">Ghi chú</th>
+            <th scope="col">Thời gian tạo</th>
+            <th scope="col">Trạng thái</th>
+            <th scope="col" colspan="2">Chức năng</th>
+          </tr>
+        </thead>
+        <tbody id="myTable">
+          <!-- <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr> -->
+        </tbody>
+      </table>
+
+      <form class="form" onsubmit="return false">
+        <span class="none"></span>
+        <div class="form-group">
+          <label for="namejob">Tên công việc</label>
+          <input type="text" class="form-control" id="namejob" required />
+          <small id="jobHelpName" class="form-text text-muted"
+            >* Bắt buộc</small
+          >
+        </div>
+        <div class="form-group">
+          <label for="descjob">Ghi chú, mô tả công việc</label>
+          <input type="text" class="form-control" id="descjob" />
+          <small id="jobHelpDesc" class="form-text text-muted"
+            >* Không bắt buộc, mô tả chi tiết công việc</small
+          >
+        </div>
+        <button type="submit" class="btn btn-success btnSubmitCreate pl-4 pr-4">
+          Thêm
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary btnUpdate"
+          onclick="handleSubmit()"
+        >
+          Cập nhật
+        </button>
+        <button class="btn btn-secondary float-right btnCancel">Hủy bỏ</button>
+      </form>
+    </div>
+  </body>
+  <script>
+    const sumBadge = document.querySelector(".sumBadge");
+    const sumDone = document.querySelector(".sumDone");
+    const sumActive = document.querySelector(".sumActive");
+    const checkFilterDone = document.querySelector("#filter_done");
+    const checkFilterActive = document.querySelector("#filter_active");
+
+    function getJobs() {
+      fetch("http://localhost:4000/api/jobs")
+        .then((res) => res.json())
+        .then((data) => {
+          // console.log(data);
+          renderJobs(data);
+          let sumJobs = data.length;
+          let sumJobsDone = data.filter(
+            (item) => item.jobState === false
+          ).length;
+
+          sumBadge.innerHTML = sumJobs;
+          sumDone.innerHTML = sumJobsDone;
+          sumActive.innerHTML = sumJobs - sumJobsDone;
+          checkFilterDone.checked = false;
+          checkFilterActive.checked = false;
+        })
+        .catch((error) => console.log(error));
+    }
+    getJobs();
+
+    function renderJobs(Jobs) {
+      let htmls = Jobs.map((job, index) => {
+        return ` <tr ${job.jobState == true ? "class='active'" : ""}>
+             <th scope="row" class="text-center">${index + 1}</th>
+             <td ${job.jobState == false ? "class='strike'" : ""}>${
+          job.jobName
+        }</td>
+             <td  ${job.jobState == false ? "class='strike'" : ""}>${
+          job.jobDesc
+        }</td>
+             <td  ${job.jobState == false ? "class='strike'" : ""}>${
+          job.createAt
+        }</td>
+             <td class="text-center pl-4">
+                  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" ${
+                    job.jobState == true ? "" : "checked"
+                  } onclick={checkboxClick("${job._id}",${job.jobState})} >
+                  ${
+                    job.jobState == true
+                      ? "<span class='ml-1 badge bg-warning text-light ml-2 mr-4 p-2 sumBadge'>Đang tiến hành <i class='fas fa-spinner fa-pulse'></i></span>"
+                      : "<span class='ml-1 badge bg-success text-light ml-2 mr-4 p-2 sumBadge'>Xong <i class='fas fa-check-double'></i></span>"
+                  }
+
+
+            </td>
+             <td class="text-center"><button class="btn btn-primary"onclick="handleClickToUpdate('${
+               job._id
+             }','${job.jobName}','${
+          job.jobDesc
+        }')">Sửa <i class="fas fa-feather-alt"></i></button></td>
+             <td class="text-center"><button class="btn btn-danger" onclick="handleClickToDelete('${
+               job._id
+             }','${
+          job.jobName
+        }')">Xóa <i class="fas fa-trash-alt"></i></button></td>
+
+           </tr>`;
+      });
+      document.querySelector("tbody").innerHTML = htmls.join("");
+    }
+    // Delete Job
+    function handleClickToDelete(id, jobName) {
+      if (
+        confirm(
+          `Bạn có chắc chắn muốn xóa công việc "${jobName}" này khỏi danh sách không?`
+        )
+      ) {
+        fetch("http://localhost:4000/api/jobs/" + id, {
+          method: "DELETE",
+        })
+          .then((res) => res.json())
+          .then(() => {
+            getJobs();
+          });
+      } else {
+        return;
+      }
+    }
+    //Post Job
+    const form = document.querySelector(".form");
+    const namejob = document.querySelector("#namejob");
+    const descjob = document.querySelector("#descjob");
+    const btnCancel = document.querySelector(".btnCancel");
+    const btnUpdate = document.querySelector(".btnUpdate");
+    const btnSubmitCreate = document.querySelector(".btnSubmitCreate");
+    const btnCteate = document.querySelector(".createBtn");
+
+    btnCteate.onclick = function () {
+      form.style.top = "100px";
+      namejob.value = "";
+      descjob.value = "";
+      btnSubmitCreate.removeAttribute("disabled");
+      btnUpdate.setAttribute("disabled", "");
+    };
+    btnSubmitCreate.onclick = () => {
+      if (document.querySelector("#namejob").value !== "") {
+        dataCreate = {
+          jobName: namejob.value,
+          jobDesc: descjob.value,
+        };
+        fetch("http://localhost:4000/api/jobs/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataCreate),
+        })
+          .then((response) => response.json())
+          //Then with the data from the response in JSON...
+          .then((data) => {
+            alert("Success: Thêm công việc thành công");
+            getJobs();
+          })
+          //Then with the error genereted...
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      } else {
+        alert("Bạn phải nhập tên công việc !!!");
+      }
+    };
+    //  Update Job
+
+    function handleClickToUpdate(id, jobName, jobDesc) {
+      form.style.top = "100px";
+      namejob.value = jobName;
+      descjob.value = jobDesc;
+      form.querySelector("span").innerHTML = id;
+      btnUpdate.removeAttribute("disabled");
+      btnSubmitCreate.setAttribute("disabled", "");
+    }
+    btnCancel.addEventListener("click", () => {
+      form.style.top = "-400px";
+    });
+
+    function handleSubmit() {
+      // e.preventDefault();
+
+      let id = document.querySelector("span[class='none']").textContent;
+      dataUpdate = {
+        jobName: namejob.value,
+        jobDesc: descjob.value,
+        jobState: true,
+      };
+
+      console.log(dataUpdate);
+      fetch("http://localhost:4000/api/jobs/" + id, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataUpdate),
+      })
+        .then((response) => response.json())
+        //Then with the data from the response in JSON...
+        .then((data) => {
+          console.log("Success:", data);
+          getJobs();
+        })
+        //Then with the error genereted...
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
+    function checkboxClick(id, state) {
+      if (confirm(`Bạn có chắc chắn muốn lưu trạng thái công việc không?`)) {
+        dataState = {
+          jobState: !state,
+        };
+        fetch("http://localhost:4000/api/jobs/" + id, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataState),
+        })
+          .then((response) => response.json())
+          //Then with the data from the response in JSON...
+          .then((data) => {
+            console.log("Success:", data);
+            getJobs();
+          })
+          //Then with the error genereted...
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      } else {
+        getJobs();
+      }
+    }
+    document.querySelector(".btn_select_all").onclick = () => {
+      getJobs();
+    };
+
+    // Search job
+    $(document).ready(function () {
+      $("#myInput").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+        $("#myTable tr").filter(function () {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+      });
+    });
+
+    $(document).ready(function () {
+      function filterJobs(bool) {
+        fetch("http://localhost:4000/api/jobs")
+          .then((res) => res.json())
+          .then((data) => {
+            const Jobs = data.filter((item, index) => item.jobState === bool);
+            renderJobs(Jobs);
+          })
+          .catch((error) => console.log(error));
+      }
+      // filter done jobs
+      $(".filter_done_check").on("click", function () {
+        filterJobs(false);
+      });
+      // filter active jobs
+      $(".filter_active_check").on("click", function () {
+        filterJobs(true);
+      });
+    });
+
+    // delete all doneJobs
+    const btnDeleteAllDone = document.querySelector(".btn_delete_all_done");
+    btnDeleteAllDone.onclick = function () {
+      if (
+        confirm(
+          `Bạn có chắc chắn muốn xóa tất cả các công việc đã hoàn thành khỏi danh sách không?`
+        )
+      ) {
+        fetch("http://localhost:4000/api/jobs")
+          .then((res) => res.json())
+          .then((data) => {
+            const doneJobs = data.filter(
+              (item, index) => item.jobState === false
+            );
+            doneJobs.forEach((item) => {
+              fetch("http://localhost:4000/api/jobs/" + item._id, {
+                method: "DELETE",
+              })
+                .then((res) => res.json())
+                .then(() => {
+                  getJobs();
+                });
+            });
+          })
+          .catch((error) => console.log(error));
+      } else {
+        return;
+      }
+    };
+  </script>
+  <script src="../handle.js"></script>
+</html>
